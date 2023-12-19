@@ -4,6 +4,7 @@ import cv2
 import open3d as o3d
 import trimesh
 import numpy as np
+import igl
 from PIL import Image as im
 
 #bin size should be multiple of mesh resolution
@@ -104,16 +105,185 @@ def compare_images(img1, img2, N):
     C = np.square(np.arctanh(R)) - (Theta * ( 1 / (N_overlap - 3)))
     
     return C
+
+#u = pd1, v = pd2
+def ridge_salience(mesh, edges, pd1, pv2):
+    ridge_salience = []
+    for edge in edges:
+        i, j = edge
+        v = mesh[i]         
+        e = v - mesh[j]
+        e /= np.linalg.norm(e) 
+        num = pd1[i] + pd1[j] 
+        num /= np.linalg.norm(num)
+        k_max =  (pv2[i] + pv2[j]) / 2
+        salience = np.dot(e, num) * k_max 
+        ridge_salience.append(salience)
+    return ridge_salience
+
+def valley_salience(mesh, edges, pd2, pv1):
+    valley_salience = [] 
+    for edge in edges:
+        i, j = edge
+        v = mesh[i]        
+        e = v - mesh[j]
+        e /= np.linalg.norm(e) 
+        num = pd2[i] + pd2[j] 
+        num /= np.linalg.norm(num)
+        k_min =  (pv1[i] + pv1[j]) / 2
+        salience = np.dot(e, num) * k_min
+        valley_salience.append(salience)
+    return valley_salience
+
+def curv_salience(ridge, valley):
+    curv = [] 
+    for i in range(len(ridge)):
+        curv.append(max(ridge[i], valley[i]))
+    return curv 
+
+
+#edges should be (vertex idx 1, vertex idx 2, weight)
+class Graph:
+    def __init__(self, vertices):
+        self.V = vertices
+        self.graph = []
+
+    def add_edge(self, u, v, w):
+        self.graph.append([u, v, w])
+
+    # Search function
+
+    def find(self, parent, i):
+        if parent[i] == i:
+            return i
+        return self.find(parent, parent[i])
+
+    def apply_union(self, parent, rank, x, y):
+        xroot = self.find(parent, x)
+        yroot = self.find(parent, y)
+        if rank[xroot] < rank[yroot]:
+            parent[xroot] = yroot
+        elif rank[xroot] > rank[yroot]:
+            parent[yroot] = xroot
+        else:
+            parent[yroot] = xroot
+            rank[xroot] += 1
+
+    #  Applying Kruskal algorithm
+    def kruskal_algo(self):
+        result = []
+        i, e = 0, 0
+        self.graph = sorted(self.graph, key=lambda item: item[2], reverse=True)
+        #print(self.graph)
+        parent = []
+        rank = []
+        for node in range(self.V):
+            parent.append(node)
+            rank.append(0)
+        while e < self.V - 1:
+            #print(i, e)
+            u, v, w = self.graph[i]
+            i = i + 1
+            x = self.find(parent, u)
+            y = self.find(parent, v)
+            if x != y:
+                e = e + 1
+                result.append([u, v, w])
+                self.apply_union(parent, rank, x, y)
+
+        #print(result)
+        #print(len(result), "vertices")
+        self.result = result 
+        #for u, v, weight in result:
+            #print("%d - %d: %d" % (u, v, weight))
+
+def set_diff2d(A, B):
+    nrows, ncols = A.shape
+    dtype={'names':['f{}'.format(i) for i in range(ncols)], 'formats':ncols * [A.dtype]}
+    C = np.setdiff1d(A.copy().view(dtype), B.copy().view(dtype))
+    return C
+
+if __name__ == "__main__":
+    tri_mesh = trimesh.load_mesh('mesh/Hand.obj')
+
+    #print(np.median(tri_mesh.edges_unique_length))
+    indices = [1, 20, 35, 40, 100]
+
+
+    #spin_image(tri_mesh, 48001)
+    #tri_mesh.show()
+    resolution = np.median(tri_mesh.edges_unique_length)
+    multiplier = 1/4
+    bin_size = resolution * multiplier
+    #print(compare_images("pictures/pic_48001.png", "pictures/pic_48001.png", bin_size))
+
+
+    v = tri_mesh.vertices 
+    f = tri_mesh.faces 
+    e = tri_mesh.edges
+    pd1, pd2, pv1, pv2 = igl.principal_curvature(v, f)
+
+    #print(e)
+    w = ridge_salience(v, e, pd1, pv2)
     
-tri_mesh = trimesh.load_mesh('mesh/Hand.obj')
+    print(len(w))
+    g = Graph(len(v))
+    for i in range(len(w)):
+        x, y = e[i]
+        g.add_edge(x, y, w[i])
 
-print(np.median(tri_mesh.edges_unique_length))
-indices = [1, 20, 35, 40, 100]
-
-
-#spin_image(tri_mesh, 48001)
-#tri_mesh.show()
-resolution = np.median(tri_mesh.edges_unique_length)
-multiplier = 1/4
-bin_size = resolution * multiplier
-print(compare_images("pictures/pic_10000.png", "pictures/pic_48001.png", bin_size))
+    #print(len(g.graph))
+    #print(g.graph[0])
+    #print(g.V)
+    g.kruskal_algo()
+    #print(len(e))
+    mst_edges = np.empty((0,2))
+    mst_verts = []
+    for i in g.result:
+        v1, v2, w = i 
+        #print(v[v1], v[v2])
+        mst_verts.append([v[v1], v[v2]])
+        mst_edges = np.vstack([mst_edges, np.array([i[0], i[1]])])
+    
+    #print(mst_edges)
+        
+    
+    loopy_edges = np.empty((0,2))
+    for i in e:
+        print(i)
+        if not i in mst_edges.tolist():
+            loopy_edges = np.vstack([mst_edges, i])
+    
+    '''
+    print(len(e))
+    print(len(mst_edges))
+    #print(len(loopy_edges))
+    print(loopy_edges)
+    '''
+    #loopy_edges = set_diff2d(e, mst_edges)
+    print(e.shape)
+    print(mst_edges.shape)
+    print(loopy_edges.shape)
+    #p = trimesh.load_path(mst_verts)
+    #print(type(p))
+    #p.show()
+    '''
+    g = Graph(6)
+    g.add_edge(0, 1, 4)
+    g.add_edge(0, 2, 4)
+    g.add_edge(1, 2, 2)
+    g.add_edge(1, 0, 4)
+    g.add_edge(2, 0, 4)
+    g.add_edge(2, 1, 2)
+    g.add_edge(2, 3, 3)
+    g.add_edge(2, 5, 2)
+    g.add_edge(2, 4, 4)
+    g.add_edge(3, 2, 3)
+    g.add_edge(3, 4, 3)
+    g.add_edge(4, 2, 4)
+    g.add_edge(4, 3, 3)
+    g.add_edge(5, 2, 2)
+    g.add_edge(5, 4, 3)
+    g.kruskal_algo()
+    '''
+    
