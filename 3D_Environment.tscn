@@ -1,0 +1,54 @@
+[gd_scene load_steps=4 format=3 uid="uid://8ky8rwuh7m46"]
+
+[ext_resource type="ArrayMesh" uid="uid://o2k8qrxt4cw4" path="res://left mandible_2.obj" id="1_0ls2o"]
+
+[sub_resource type="Environment" id="Environment_hsvjw"]
+background_mode = 1
+background_color = Color(0.851902, 0.603082, 0.668276, 1)
+background_canvas_max_layer = 1
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_ndefm"]
+
+[node name="CanvasLayer" type="CanvasLayer"]
+
+[node name="Node3D" type="Node3D" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Node3D"]
+environment = SubResource("Environment_hsvjw")
+camera_attributes = SubResource("CameraAttributesPractical_ndefm")
+
+[node name="LeftMandible2" type="MeshInstance3D" parent="Node3D/WorldEnvironment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.996047, 31.5998, 22.3291)
+mesh = ExtResource("1_0ls2o")
+skeleton = NodePath("../../..")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Node3D/WorldEnvironment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.38419e-07, 1.70542, -0.00735903)
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="Node3D"]
+anchors_preset = -1
+anchor_right = 0.474
+anchor_bottom = 0.578
+offset_right = 617.952
+offset_bottom = 292.456
+
+[node name="SubViewport" type="SubViewport" parent="Node3D/SubViewportContainer"]
+size = Vector2i(1024, 512)
+
+[node name="Camera3D" type="Camera3D" parent="Node3D/SubViewportContainer/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.0334, 12.4954, 42.1407)
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 152.0
+offset_bottom = 140.0
+
+[node name="MenuButton" type="MenuButton" parent="Control"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.737
+anchor_bottom = 1.0
+offset_right = 59.976
+offset_bottom = -54.0
+text = "Item Menu"
