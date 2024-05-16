@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://8ky8rwuh7m46"]
+[gd_scene load_steps=5 format=3 uid="uid://8ky8rwuh7m46"]
 
 [ext_resource type="ArrayMesh" uid="uid://o2k8qrxt4cw4" path="res://left mandible_2.obj" id="1_0ls2o"]
+[ext_resource type="Script" path="res://CameraMovement.gd" id="1_tcyj5"]
 
 [sub_resource type="Environment" id="Environment_hsvjw"]
 background_mode = 1
@@ -9,34 +10,37 @@ background_canvas_max_layer = 1
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_ndefm"]
 
-[node name="CanvasLayer" type="CanvasLayer"]
+[node name="Root Canvas Layer" type="CanvasLayer"]
 
-[node name="Node3D" type="Node3D" parent="."]
+[node name="Root 3D Node" type="Node3D" parent="."]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="Node3D"]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Root 3D Node"]
 environment = SubResource("Environment_hsvjw")
 camera_attributes = SubResource("CameraAttributesPractical_ndefm")
 
-[node name="LeftMandible2" type="MeshInstance3D" parent="Node3D/WorldEnvironment"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.996047, 31.5998, 22.3291)
+[node name="LeftMandible2" type="MeshInstance3D" parent="Root 3D Node/WorldEnvironment"]
+transform = Transform3D(1, 0, 0, 0, -0.464116, 0.885775, 0, -0.885775, -0.464116, -12.451, 40.1241, -164.276)
 mesh = ExtResource("1_0ls2o")
 skeleton = NodePath("../../..")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Node3D/WorldEnvironment"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.38419e-07, 1.70542, -0.00735903)
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Root 3D Node/WorldEnvironment"]
+transform = Transform3D(1, 0, 0, 0, 0.999798, 0.0200874, 0, -0.0200874, 0.999798, -2.38419e-07, 1.70542, -0.00735903)
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="Node3D"]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="Root 3D Node"]
 anchors_preset = -1
 anchor_right = 0.474
 anchor_bottom = 0.578
-offset_right = 617.952
-offset_bottom = 292.456
+offset_left = 1.0
+offset_top = 4.0
+offset_right = 618.952
+offset_bottom = 296.456
 
-[node name="SubViewport" type="SubViewport" parent="Node3D/SubViewportContainer"]
-size = Vector2i(1024, 512)
+[node name="SubViewport" type="SubViewport" parent="Root 3D Node/SubViewportContainer"]
+size = Vector2i(1150, 640)
 
-[node name="Camera3D" type="Camera3D" parent="Node3D/SubViewportContainer/SubViewport"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.0334, 12.4954, 42.1407)
+[node name="Camera3D" type="Camera3D" parent="Root 3D Node/SubViewportContainer/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 2.08165e-12, 2.08165e-12)
+script = ExtResource("1_tcyj5")
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -52,3 +56,11 @@ anchor_bottom = 1.0
 offset_right = 59.976
 offset_bottom = -54.0
 text = "Item Menu"
+
+[node name="Button" type="Button" parent="Control/MenuButton"]
+layout_mode = 0
+offset_left = -1.0
+offset_top = 82.0
+offset_right = 177.0
+offset_bottom = 113.0
+text = "Recenter Camera"
