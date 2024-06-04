@@ -23,7 +23,16 @@ func _process(delta):
 		#rotate_z((next_mouse_position.y - prev_mouse_position.y) * rot_factor * delta)
 		var translation_vector = Vector3(next_mouse_position.x - prev_mouse_position.x, 0, next_mouse_position.y -prev_mouse_position.y) * rot_factor
 		translate(translation_vector) 
-		
+	
 
 
 
+
+func _on_button_pressed():
+	print('pre button press', self.position)
+	var position = self.position
+	var rotation = self.rotation
+	print('rotation', rotation)
+	var oppositeVector = Vector3(-1 * self.position.x, -1 * self.position.y, -1 * self.position.z)
+	self.translate(oppositeVector)
+	print('post button press', self.position)
