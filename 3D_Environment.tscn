@@ -67,15 +67,4 @@ offset_right = 177.0
 offset_bottom = 113.0
 text = "Recenter Camera"
 
-[node name="HSlider" type="HSlider" parent="Control"]
-layout_mode = 1
-anchors_preset = -1
-anchor_right = 0.072
-anchor_bottom = 0.146
-offset_left = 32.0
-offset_top = 140.0
-offset_right = 53.056
-offset_bottom = 135.56
-tick_count = 17
-
 [connection signal="pressed" from="Control/MenuButton/recenterCamera" to="Root 3D Node/SubViewportContainer/subView/mainCamera" method="_on_button_pressed"]
