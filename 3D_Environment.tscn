@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://8ky8rwuh7m46"]
+[gd_scene load_steps=7 format=3 uid="uid://8ky8rwuh7m46"]
 
 [ext_resource type="ArrayMesh" uid="uid://o2k8qrxt4cw4" path="res://left mandible_2.obj" id="1_0ls2o"]
 [ext_resource type="Script" path="res://CameraMovement.gd" id="1_tcyj5"]
+[ext_resource type="Texture2D" uid="uid://fb4b84bxwocc" path="res://video-camera-svgrepo-com (1).svg" id="3_m5ydu"]
 [ext_resource type="Texture2D" uid="uid://bi6t64mwb8bgb" path="res://hand-drag-svgrepo-com.svg" id="3_woacj"]
 
 [sub_resource type="Environment" id="Environment_hsvjw"]
@@ -34,12 +35,12 @@ anchor_right = 2.249
 anchor_bottom = 1.981
 offset_left = 1.0
 offset_top = 4.0
-offset_right = -1431.85
-offset_bottom = -639.688
+offset_right = -1349.85
+offset_bottom = -523.688
 
 [node name="subView" type="SubViewport" parent="Root 3D Node/SubViewportContainer"]
 handle_input_locally = false
-size = Vector2i(1158, 640)
+size = Vector2i(1240, 756)
 render_target_update_mode = 4
 
 [node name="mainCamera" type="Camera3D" parent="Root 3D Node/SubViewportContainer/subView"]
@@ -55,10 +56,19 @@ offset_bottom = 140.0
 [node name="recenterCamera" type="Button" parent="Control"]
 layout_mode = 0
 offset_left = 2.0
-offset_top = 62.0
+offset_top = 5.0
 offset_right = 180.0
-offset_bottom = 93.0
+offset_bottom = 36.0
 text = "Recenter Camera"
+
+[node name="rotateCameraButton" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 49.0
+offset_top = 190.0
+offset_right = 867.0
+offset_bottom = 1196.0
+scale = Vector2(0.0777812, 0.0648685)
+icon = ExtResource("3_m5ydu")
 
 [node name="dragCameraButton" type="Button" parent="Control"]
 layout_mode = 1
@@ -66,14 +76,16 @@ anchors_preset = -1
 anchor_right = 0.074
 anchor_bottom = 0.132
 offset_left = 46.0
-offset_top = 171.0
+offset_top = 91.0
 offset_right = 839.348
-offset_bottom = 960.52
+offset_bottom = 880.52
 scale = Vector2(0.0800024, 0.08)
 action_mode = 0
 keep_pressed_outside = true
 icon = ExtResource("3_woacj")
 
 [connection signal="pressed" from="Control/recenterCamera" to="Root 3D Node/SubViewportContainer/subView/mainCamera" method="_on_recenter_camera_button_pressed"]
+[connection signal="button_down" from="Control/rotateCameraButton" to="Root 3D Node/SubViewportContainer/subView/mainCamera" method="_on_rotate_camera_button_button_down"]
+[connection signal="button_up" from="Control/rotateCameraButton" to="Root 3D Node/SubViewportContainer/subView/mainCamera" method="_on_rotate_camera_button_button_up"]
 [connection signal="button_down" from="Control/dragCameraButton" to="Root 3D Node/SubViewportContainer/subView/mainCamera" method="_on_drag_camera_button_button_down"]
 [connection signal="button_up" from="Control/dragCameraButton" to="Root 3D Node/SubViewportContainer/subView/mainCamera" method="_on_drag_camera_button_button_up"]
