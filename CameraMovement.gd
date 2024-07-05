@@ -59,3 +59,4 @@ func _on_rotate_camera_button_button_down():
 
 func _on_rotate_camera_button_button_up():
 	rotating = false
+

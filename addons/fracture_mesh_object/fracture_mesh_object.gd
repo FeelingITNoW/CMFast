@@ -3,8 +3,8 @@ extends EditorPlugin
 
 
 func _enter_tree():
-	# Initialization of the plugin goes here.
-	pass
+	add_custom_type("Fracture Mesh", "Node3D", preload("fractureMeshObject.gd"), preload('res://icon.svg'))
+	
 
 
 func _exit_tree():
