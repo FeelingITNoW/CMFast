@@ -15,6 +15,10 @@ run/main_scene="res://3D_Environment.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
 config/icon="res://icon.svg"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/fracture_mesh_object/plugin.cfg")
+
 [input]
 
 ui_mouse_click={
